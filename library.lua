@@ -20,7 +20,7 @@ end
 
 function Library:CreateWindow(config)
     config = config or {}
-    local windowName = config.Name or "Default Hub"
+    local windowName = config.Name or "Hub"
     
     local TargetParent = GetTargetParent()
     if TargetParent:FindFirstChild("MyCustomGui_Container") then
@@ -58,7 +58,6 @@ function Library:CreateWindow(config)
     MainStroke.Color = Theme.Border
     MainStroke.Parent = Main
 
-    -- Сайдбар
     local Sidebar = Instance.new("Frame")
     Sidebar.Size = UDim2.new(0, 160, 1, 0)
     Sidebar.BackgroundColor3 = Theme.Sidebar
@@ -121,7 +120,7 @@ function Library:CreateWindow(config)
         end
     end)
 
-    -- Перетаскиваемая кнопка 50x50
+    -- Кнопка сворачивания (ToggleUI)
     local ToggleUI = Instance.new("ImageButton")
     ToggleUI.Size = UDim2.new(0, 50, 0, 50)
     ToggleUI.Position = UDim2.new(0, 15, 0, 15)
@@ -260,6 +259,7 @@ function Library:CreateWindow(config)
 
             local GroupObj = {}
 
+            -- Кнопка
             function GroupObj:AddButton(text, callback)
                 local Btn = Instance.new("TextButton")
                 Btn.Size = UDim2.new(1, 0, 0, 28)
@@ -277,6 +277,7 @@ function Library:CreateWindow(config)
                 end)
             end
 
+            -- Улучшенный Переключатель (Toggle)
             function GroupObj:AddToggle(text, default, callback)
                 local Toggled = default or false
                 local ToggleBtn = Instance.new("TextButton")
@@ -305,11 +306,19 @@ function Library:CreateWindow(config)
                 Box.Parent = ToggleBtn
                 Instance.new("UICorner", Box).CornerRadius = UDim.new(0, 4)
 
-                ToggleBtn.MouseButton1Click:Connect(function()
-                    Toggled = not Toggled
+                local ToggleObj = {}
+                
+                function ToggleObj:Set(value)
+                    Toggled = value
                     Box.BackgroundColor3 = Toggled and Theme.Accent or Theme.Group
                     if callback then callback(Toggled) end
+                end
+
+                ToggleBtn.MouseButton1Click:Connect(function()
+                    ToggleObj:Set(not Toggled)
                 end)
+
+                return ToggleObj
             end
 
             return GroupObj
