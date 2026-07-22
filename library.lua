@@ -99,7 +99,7 @@ function Library:CreateWindow(config)
     ContainerArea.BackgroundTransparency = 1
     ContainerArea.Parent = Main
 
-    -- Перетаскивание главного окна
+    -- Перетаскивание меню
     local dragging, dragStart, startPos
     Main.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -120,7 +120,7 @@ function Library:CreateWindow(config)
         end
     end)
 
-    -- Кнопка сворачивания (ToggleUI)
+    -- Перетаскиваемая кнопка сворачивания (50x50)
     local ToggleUI = Instance.new("ImageButton")
     ToggleUI.Size = UDim2.new(0, 50, 0, 50)
     ToggleUI.Position = UDim2.new(0, 15, 0, 15)
@@ -259,7 +259,7 @@ function Library:CreateWindow(config)
 
             local GroupObj = {}
 
-            -- Кнопка
+            -- Обычная кнопка
             function GroupObj:AddButton(text, callback)
                 local Btn = Instance.new("TextButton")
                 Btn.Size = UDim2.new(1, 0, 0, 28)
@@ -277,9 +277,10 @@ function Library:CreateWindow(config)
                 end)
             end
 
-            -- Улучшенный Переключатель (Toggle)
+            -- Переключатель ON / OFF
             function GroupObj:AddToggle(text, default, callback)
                 local Toggled = default or false
+                
                 local ToggleBtn = Instance.new("TextButton")
                 ToggleBtn.Size = UDim2.new(1, 0, 0, 28)
                 ToggleBtn.BackgroundColor3 = Theme.Item
@@ -289,7 +290,7 @@ function Library:CreateWindow(config)
                 Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(0, 5)
 
                 local TText = Instance.new("TextLabel")
-                TText.Size = UDim2.new(1, -40, 1, 0)
+                TText.Size = UDim2.new(1, -60, 1, 0)
                 TText.Position = UDim2.new(0, 10, 0, 0)
                 TText.BackgroundTransparency = 1
                 TText.Text = text
@@ -299,18 +300,23 @@ function Library:CreateWindow(config)
                 TText.TextXAlignment = Enum.TextXAlignment.Left
                 TText.Parent = ToggleBtn
 
-                local Box = Instance.new("Frame")
-                Box.Size = UDim2.new(0, 16, 0, 16)
-                Box.Position = UDim2.new(1, -24, 0.5, -8)
-                Box.BackgroundColor3 = Toggled and Theme.Accent or Theme.Group
-                Box.Parent = ToggleBtn
-                Instance.new("UICorner", Box).CornerRadius = UDim.new(0, 4)
+                local StatusBadge = Instance.new("TextLabel")
+                StatusBadge.Size = UDim2.new(0, 42, 0, 18)
+                StatusBadge.Position = UDim2.new(1, -50, 0.5, -9)
+                StatusBadge.BackgroundColor3 = Toggled and Theme.Accent or Color3.fromRGB(45, 48, 58)
+                StatusBadge.Text = Toggled and "ON" or "OFF"
+                StatusBadge.TextColor3 = Theme.Text
+                StatusBadge.TextSize = 10
+                StatusBadge.Font = Enum.Font.GothamBold
+                StatusBadge.Parent = ToggleBtn
+                Instance.new("UICorner", StatusBadge).CornerRadius = UDim.new(0, 4)
 
                 local ToggleObj = {}
-                
+
                 function ToggleObj:Set(value)
                     Toggled = value
-                    Box.BackgroundColor3 = Toggled and Theme.Accent or Theme.Group
+                    StatusBadge.Text = Toggled and "ON" or "OFF"
+                    StatusBadge.BackgroundColor3 = Toggled and Theme.Accent or Color3.fromRGB(45, 48, 58)
                     if callback then callback(Toggled) end
                 end
 
