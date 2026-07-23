@@ -28,11 +28,15 @@ function Library:CreateWindow(config)
     end
 
     local Theme = {
-        Bg = Color3.fromRGB(22, 23, 27),
-        Sidebar = Color3.fromRGB(18, 19, 22),
-        Group = Color3.fromRGB(28, 30, 36),
-        Item = Color3.fromRGB(36, 38, 46),
-        Accent = Color3.fromRGB(115, 125, 255),
+        Bg = Color3.fromRGB(20, 21, 26),
+        Sidebar = Color3.fromRGB(16, 17, 21),
+        Group = Color3.fromRGB(26, 28, 34),
+        Item = Color3.fromRGB(32, 34, 42),
+        -- Цвета точно по видео:
+        ToggleOn = Color3.fromRGB(165, 135, 255),  -- Яркий фиолетовый
+        ToggleOff = Color3.fromRGB(42, 45, 56),   -- Тёмно-серый
+        KnobOn = Color3.fromRGB(255, 255, 255),   -- Белый шарик
+        KnobOff = Color3.fromRGB(120, 125, 140),  -- Серый шарик
         Text = Color3.fromRGB(240, 242, 248),
         TextSub = Color3.fromRGB(130, 134, 146),
         Border = Color3.fromRGB(38, 40, 48)
@@ -99,7 +103,7 @@ function Library:CreateWindow(config)
     ContainerArea.BackgroundTransparency = 1
     ContainerArea.Parent = Main
 
-    -- Перетаскивание меню
+    -- Драг окна
     local dragging, dragStart, startPos
     Main.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -120,7 +124,7 @@ function Library:CreateWindow(config)
         end
     end)
 
-    -- Перетаскиваемая кнопка сворачивания (50x50)
+    -- Кнопка скрыть/показать UI
     local ToggleUI = Instance.new("ImageButton")
     ToggleUI.Size = UDim2.new(0, 50, 0, 50)
     ToggleUI.Position = UDim2.new(0, 15, 0, 15)
@@ -185,7 +189,7 @@ function Library:CreateWindow(config)
 
         local TabBtn = Instance.new("TextButton")
         TabBtn.Size = UDim2.new(1, 0, 0, 30)
-        TabBtn.BackgroundColor3 = Theme.Accent
+        TabBtn.BackgroundColor3 = Theme.ToggleOn
         TabBtn.BackgroundTransparency = 1
         TabBtn.Text = tabName
         TabBtn.TextColor3 = Theme.TextSub
@@ -259,10 +263,10 @@ function Library:CreateWindow(config)
 
             local GroupObj = {}
 
-            -- Обычная кнопка
+            -- Кнопка
             function GroupObj:AddButton(text, callback)
                 local Btn = Instance.new("TextButton")
-                Btn.Size = UDim2.new(1, 0, 0, 28)
+                Btn.Size = UDim2.new(1, 0, 0, 32)
                 Btn.BackgroundColor3 = Theme.Item
                 Btn.Text = text
                 Btn.TextColor3 = Theme.Text
@@ -270,53 +274,76 @@ function Library:CreateWindow(config)
                 Btn.Font = Enum.Font.GothamMedium
                 Btn.AutoButtonColor = false
                 Btn.Parent = ContentBox
-                Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 5)
+                Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
 
                 Btn.MouseButton1Click:Connect(function()
                     if callback then callback() end
                 end)
             end
 
-            -- Переключатель ON / OFF
+            -- Плавный Switch 1 в 1 как на видео
             function GroupObj:AddToggle(text, default, callback)
                 local Toggled = default or false
                 
                 local ToggleBtn = Instance.new("TextButton")
-                ToggleBtn.Size = UDim2.new(1, 0, 0, 28)
+                ToggleBtn.Size = UDim2.new(1, 0, 0, 36)
                 ToggleBtn.BackgroundColor3 = Theme.Item
                 ToggleBtn.Text = ""
                 ToggleBtn.AutoButtonColor = false
                 ToggleBtn.Parent = ContentBox
-                Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(0, 5)
+                Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(0, 6)
 
                 local TText = Instance.new("TextLabel")
-                TText.Size = UDim2.new(1, -60, 1, 0)
-                TText.Position = UDim2.new(0, 10, 0, 0)
+                TText.Size = UDim2.new(1, -65, 1, 0)
+                TText.Position = UDim2.new(0, 12, 0, 0)
                 TText.BackgroundTransparency = 1
                 TText.Text = text
                 TText.TextColor3 = Theme.Text
-                TText.TextSize = 11
+                TText.TextSize = 12
                 TText.Font = Enum.Font.GothamMedium
                 TText.TextXAlignment = Enum.TextXAlignment.Left
                 TText.Parent = ToggleBtn
 
-                local StatusBadge = Instance.new("TextLabel")
-                StatusBadge.Size = UDim2.new(0, 42, 0, 18)
-                StatusBadge.Position = UDim2.new(1, -50, 0.5, -9)
-                StatusBadge.BackgroundColor3 = Toggled and Theme.Accent or Color3.fromRGB(45, 48, 58)
-                StatusBadge.Text = Toggled and "ON" or "OFF"
-                StatusBadge.TextColor3 = Theme.Text
-                StatusBadge.TextSize = 10
-                StatusBadge.Font = Enum.Font.GothamBold
-                StatusBadge.Parent = ToggleBtn
-                Instance.new("UICorner", StatusBadge).CornerRadius = UDim.new(0, 4)
+                -- Фоновый капсюль
+                local SwitchPill = Instance.new("Frame")
+                SwitchPill.Size = UDim2.new(0, 44, 0, 22)
+                SwitchPill.Position = UDim2.new(1, -52, 0.5, -11)
+                SwitchPill.BackgroundColor3 = Toggled and Theme.ToggleOn or Theme.ToggleOff
+                SwitchPill.BorderSizePixel = 0
+                SwitchPill.Parent = ToggleBtn
+                Instance.new("UICorner", SwitchPill).CornerRadius = UDim.new(1, 0)
+
+                -- Шарик переключателя
+                local Knob = Instance.new("Frame")
+                Knob.Size = Toggled and UDim2.new(0, 16, 0, 16) or UDim2.new(0, 14, 0, 14)
+                Knob.Position = Toggled and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 4, 0.5, -7)
+                Knob.BackgroundColor3 = Toggled and Theme.KnobOn or Theme.KnobOff
+                Knob.BorderSizePixel = 0
+                Knob.Parent = SwitchPill
+                Instance.new("UICorner", Knob).CornerRadius = UDim.new(1, 0)
+
+                local tweenFast = TweenInfo.new(0.18, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
 
                 local ToggleObj = {}
 
                 function ToggleObj:Set(value)
                     Toggled = value
-                    StatusBadge.Text = Toggled and "ON" or "OFF"
-                    StatusBadge.BackgroundColor3 = Toggled and Theme.Accent or Color3.fromRGB(45, 48, 58)
+                    
+                    local targetPos = Toggled and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 4, 0.5, -7)
+                    local targetSize = Toggled and UDim2.new(0, 16, 0, 16) or UDim2.new(0, 14, 0, 14)
+                    local pillColor = Toggled and Theme.ToggleOn or Theme.ToggleOff
+                    local knobColor = Toggled and Theme.KnobOn or Theme.KnobOff
+
+                    TweenService:Create(Knob, tweenFast, {
+                        Position = targetPos,
+                        Size = targetSize,
+                        BackgroundColor3 = knobColor
+                    }):Play()
+
+                    TweenService:Create(SwitchPill, tweenFast, {
+                        BackgroundColor3 = pillColor
+                    }):Play()
+
                     if callback then callback(Toggled) end
                 end
 
